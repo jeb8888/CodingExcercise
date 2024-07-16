@@ -6,11 +6,27 @@ from threading import Thread
 from os.path import getsize
 
 class Server(Thread):
+# Implementing the Thread class is a sure way to have multiple connections from clients. I tested the Server class without it and the multiple clients would connect, but the server would return the result from the whatever client connected first. 
+
+# By separating the code into modular classes, this encapsulates the functionalities and makes the code more organized and easier to maintain at scale.  
+
+	"""
+	Initialize the server with a IP address
+	
+	connfd: a socket object
+	addr: a string containg the IP address
+	return void
+	"""
 	def __init__(self, connfd, addr):
 		super().__init__()
 		self.connfd = connfd
 		self.addr = addr
 
+	"""
+	Run the server application in a thread. The thread recieves text from the client
+
+	return void
+	"""
 	def run(self):
 		while True:
 			try:
@@ -21,7 +37,8 @@ class Server(Thread):
 				operation, operand1, operand2 = struct.unpack('>cii', data) # Deconstruct the binary data. It's a character, an int32, and another int32, 9 bytes total
 				operator = operation.decode()
 				
-				# You could easily add different operations here with an if statement. You need to update the client file as well
+				
+				# You could easily add different operations here with an if statement. You need to update the client file as well. You could add modulus (%) and exponents (^)
 				if operator == '+':	
 					result = operand1 + operand2
 				elif operator == '-':
@@ -42,6 +59,11 @@ class Server(Thread):
 		print(f"Closed connection to {self.addr}")
 		self.connfd.close()
 
+"""
+Main method. Start the server and bind the socket
+
+return void
+"""
 def main():
 	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 	sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
